@@ -145,7 +145,7 @@ Compiled WebAssembly binaries are committed to ./dist for convenience, but these
 	2. `cd emsdk`
 	3. `git pull && ./emsdk install 3.1.10 && ./emsdk activate 3.1.10 && source ./emsdk_env.sh`
 	4. `export EMSCRIPTEN=path/to/emsdk/upstream/emscripten` (change for your system)
-2. Clone monero-ts repository: `git clone --recursive https://github.com/woodser/monero-ts.git`
+2. Clone monero-ts repository: `git clone --recursive https://github.com/MoreloNetwork/monero-ts.git`
 3. `cd monero-ts`
 4. `./bin/update_submodules.sh`
 5. Modify ./external/monero-cpp/external/monero-project/src/crypto/wallet/CMakeLists.txt from `set(MONERO_WALLET_CRYPTO_LIBRARY "auto" ...` to `set(MONERO_WALLET_CRYPTO_LIBRARY "cn" ...`.
@@ -154,7 +154,7 @@ Compiled WebAssembly binaries are committed to ./dist for convenience, but these
 
 ## Running tests
 
-1. Clone the project repository: `git clone https://github.com/woodser/monero-ts.git`
+1. Clone the project repository: `git clone https://github.com/MoreloNetowkr/monero-ts.git`
 2. `cd monero-ts`
 3. Start RPC servers:
 	1. Download and install [Monero CLI](https://web.getmonero.org/downloads/).

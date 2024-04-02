@@ -856,9 +856,9 @@ class MoneroDaemonRpc extends _MoneroDaemon.default {
     (0, _assert.default)(_GenUtils.default.isArray(config.cmd), "Must provide string array with command line parameters");
 
     // start process
-    let process = require('child_process').spawn(config.cmd[0], config.cmd.slice(1), {});
-    process.stdout.setEncoding('utf8');
-    process.stderr.setEncoding('utf8');
+    const proc = require('child_process').spawn(config.cmd[0], config.cmd.slice(1), {});
+    proc.stdout.setEncoding('utf8');
+    proc.stderr.setEncoding('utf8');
 
     // return promise which resolves after starting monerod
     let uri;
@@ -867,20 +867,23 @@ class MoneroDaemonRpc extends _MoneroDaemon.default {
       return await new Promise(function (resolve, reject) {
 
         // handle stdout
-        process.stdout.on('data', async function (data) {
+        proc.stdout.on('data', async function (data) {
           let line = data.toString();
           _LibraryUtils.default.log(2, line);
           output += line + '\n'; // capture output in case of error
+          line = line.replace(/\u001b\[.*?m/g, '').trim(); // remove color formatting
 
-          // extract uri from e.g. "I Binding on 127.0.0.1 (IPv4):38085"
-          let uriLineContains = "Binding on ";
+          // extract uri from e.g. "I Binding on 127.0.0.1 (IPv4):38085" or "I Binding on 127.0.0.1:38085"
+          const uriLineContains = "Binding on ";
           let uriLineContainsIdx = line.indexOf(uriLineContains);
-          if (uriLineContainsIdx >= 0) {
-            let host = line.substring(uriLineContainsIdx + uriLineContains.length, line.lastIndexOf(' '));
-            let unformattedLine = line.replace(/\u001b\[.*?m/g, '').trim(); // remove color formatting
-            let port = unformattedLine.substring(unformattedLine.lastIndexOf(':') + 1);
-            let sslIdx = config.cmd.indexOf("--rpc-ssl");
-            let sslEnabled = sslIdx >= 0 ? "enabled" == config.cmd[sslIdx + 1].toLowerCase() : false;
+          if (uriLineContainsIdx !== -1) {
+            uriLineContainsIdx += uriLineContains.length;
+            const hostIdx = line.indexOf(' ', uriLineContainsIdx);
+            const portIdx = line.indexOf(':', uriLineContainsIdx);
+            const host = line.substring(uriLineContainsIdx, hostIdx !== -1 ? hostIdx : portIdx);
+            const port = line.substring(portIdx + 1);
+            const sslIdx = config.cmd.indexOf("--rpc-ssl");
+            const sslEnabled = sslIdx !== -1 ? "enabled" == config.cmd[sslIdx + 1].toLowerCase() : false;
             uri = (sslEnabled ? "https" : "http") + "://" + host + ":" + port;
           }
 
@@ -888,17 +891,17 @@ class MoneroDaemonRpc extends _MoneroDaemon.default {
           if (line.indexOf("core RPC server started ok") >= 0) {
 
             // get username and password from params
-            let userPassIdx = config.cmd.indexOf("--rpc-login");
-            let userPass = userPassIdx >= 0 ? config.cmd[userPassIdx + 1] : undefined;
-            let username = userPass === undefined ? undefined : userPass.substring(0, userPass.indexOf(':'));
-            let password = userPass === undefined ? undefined : userPass.substring(userPass.indexOf(':') + 1);
+            const userPassIdx = config.cmd.indexOf("--rpc-login");
+            const userPass = userPassIdx >= 0 ? config.cmd[userPassIdx + 1] : undefined;
+            const username = userPass === undefined ? undefined : userPass.substring(0, userPass.indexOf(':'));
+            const password = userPass === undefined ? undefined : userPass.substring(userPass.indexOf(':') + 1);
 
             // create client connected to internal process
             config = config.copy().setServer({ uri: uri, username: username, password: password, rejectUnauthorized: config.getServer() ? config.getServer().getRejectUnauthorized() : undefined });
             config.setProxyToWorker(config.proxyToWorker);
             config.cmd = undefined;
-            let daemon = await MoneroDaemonRpc.connectToDaemonRpc(config);
-            daemon.process = process;
+            const daemon = await MoneroDaemonRpc.connectToDaemonRpc(config);
+            daemon.process = proc;
 
             // resolve promise with client connected to internal process 
             this.isResolved = true;
@@ -907,23 +910,23 @@ class MoneroDaemonRpc extends _MoneroDaemon.default {
         });
 
         // handle stderr
-        process.stderr.on('data', function (data) {
+        proc.stderr.on('data', function (data) {
           if (_LibraryUtils.default.getLogLevel() >= 2) console.error(data);
         });
 
         // handle exit
-        process.on("exit", function (code) {
+        proc.on("exit", function (code) {
           if (!this.isResolved) reject(new Error("monerod process terminated with exit code " + code + (output ? ":\n\n" + output : "")));
         });
 
         // handle error
-        process.on("error", function (err) {
+        proc.on("error", function (err) {
           if (err.message.indexOf("ENOENT") >= 0) reject(new Error("monerod does not exist at path '" + config.cmd[0] + "'"));
           if (!this.isResolved) reject(err);
         });
 
         // handle uncaught exception
-        process.on("uncaughtException", function (err, origin) {
+        proc.on("uncaughtException", function (err, origin) {
           console.error("Uncaught exception in monerod process: " + err.message);
           console.error(origin);
           if (!this.isResolved) reject(err);
