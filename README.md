@@ -2,6 +2,8 @@
 
 A TypeScript library for creating Monero applications using RPC and WebAssembly bindings to [monero v0.18.3.3 'Fluorine Fermi'](https://github.com/monero-project/monero/tree/v0.18.3.3).
 
+This fork tries to be as backwards compatible with older versions as possible.
+
 * Supports client-side wallets in Node.js and the browser using WebAssembly.
 * Supports wallet and daemon RPC clients.
 * Supports multisig, view-only, and offline wallets.

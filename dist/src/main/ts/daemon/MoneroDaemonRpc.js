@@ -968,12 +968,12 @@ class MoneroDaemonRpc extends _MoneroDaemon.default {
       let val = rpcHeader[key];
       if (key === "block_size") _GenUtils.default.safeSet(header, header.getSize, header.setSize, val);else
       if (key === "depth") _GenUtils.default.safeSet(header, header.getDepth, header.setDepth, val);else
-      if (key === "difficulty") {} // handled by wide_difficulty
-      else if (key === "cumulative_difficulty") {} // handled by wide_cumulative_difficulty
-      else if (key === "difficulty_top64") {} // handled by wide_difficulty
+      if (key === "difficulty") header.setDifficulty(_GenUtils.default.reconcile(header.getDifficulty(), val, { resolveMax: true }));else
+      if (key === "cumulative_difficulty") header.setCumulativeDifficulty(_GenUtils.default.reconcile(header.getCumulativeDifficulty(), val, { resolveMax: true }));else
+      if (key === "difficulty_top64") {} // handled by wide_difficulty
       else if (key === "cumulative_difficulty_top64") {} // handled by wide_cumulative_difficulty
-      else if (key === "wide_difficulty") header.setDifficulty(_GenUtils.default.reconcile(header.getDifficulty(), MoneroDaemonRpc.prefixedHexToBI(val)));else
-      if (key === "wide_cumulative_difficulty") header.setCumulativeDifficulty(_GenUtils.default.reconcile(header.getCumulativeDifficulty(), MoneroDaemonRpc.prefixedHexToBI(val)));else
+      else if (key === "wide_difficulty") header.setDifficulty(_GenUtils.default.reconcile(header.getDifficulty(), MoneroDaemonRpc.prefixedHexToBI(val), { resolveMax: true }));else
+      if (key === "wide_cumulative_difficulty") header.setCumulativeDifficulty(_GenUtils.default.reconcile(header.getCumulativeDifficulty(), MoneroDaemonRpc.prefixedHexToBI(val), { resolveMax: true }));else
       if (key === "hash") _GenUtils.default.safeSet(header, header.getHash, header.setHash, val);else
       if (key === "height") _GenUtils.default.safeSet(header, header.getHeight, header.setHeight, val);else
       if (key === "major_version") _GenUtils.default.safeSet(header, header.getMajorVersion, header.setMajorVersion, val);else
@@ -1158,9 +1158,9 @@ class MoneroDaemonRpc extends _MoneroDaemon.default {
       if (key === "blocktemplate_blob") template.setBlockHashingBlob(val);else
       if (key === "difficulty") template.setDifficulty(BigInt(val));else
       if (key === "expected_reward") template.setExpectedReward(val);else
-      if (key === "difficulty") {} // handled by wide_difficulty
-      else if (key === "difficulty_top64") {} // handled by wide_difficulty
-      else if (key === "wide_difficulty") template.setDifficulty(_GenUtils.default.reconcile(template.getDifficulty(), MoneroDaemonRpc.prefixedHexToBI(val)));else
+      if (key === "difficulty") template.setDifficulty(_GenUtils.default.reconcile(template.getDifficulty(), val, { resolveMax: true }));else
+      if (key === "difficulty_top64") {} // handled by wide_difficulty
+      else if (key === "wide_difficulty") template.setDifficulty(_GenUtils.default.reconcile(template.getDifficulty(), MoneroDaemonRpc.prefixedHexToBI(val), { resolveMax: true }));else
       if (key === "height") template.setHeight(val);else
       if (key === "prev_hash") template.setPrevHash(val);else
       if (key === "reserved_offset") template.setReservedOffset(val);else
@@ -1187,12 +1187,12 @@ class MoneroDaemonRpc extends _MoneroDaemon.default {
       if (key === "block_weight_limit") info.setBlockWeightLimit(val);else
       if (key === "block_weight_median") info.setBlockWeightMedian(val);else
       if (key === "bootstrap_daemon_address") {if (val) info.setBootstrapDaemonAddress(val);} else
-      if (key === "difficulty") {} // handled by wide_difficulty
-      else if (key === "cumulative_difficulty") {} // handled by wide_cumulative_difficulty
-      else if (key === "difficulty_top64") {} // handled by wide_difficulty
+      if (key === "difficulty") info.setDifficulty(_GenUtils.default.reconcile(info.getDifficulty(), val, { resolveMax: true }));else
+      if (key === "cumulative_difficulty") info.setCumulativeDifficulty(_GenUtils.default.reconcile(info.getCumulativeDifficulty(), val, { resolveMax: true }));else
+      if (key === "difficulty_top64") {} // handled by wide_difficulty
       else if (key === "cumulative_difficulty_top64") {} // handled by wide_cumulative_difficulty
-      else if (key === "wide_difficulty") info.setDifficulty(_GenUtils.default.reconcile(info.getDifficulty(), MoneroDaemonRpc.prefixedHexToBI(val)));else
-      if (key === "wide_cumulative_difficulty") info.setCumulativeDifficulty(_GenUtils.default.reconcile(info.getCumulativeDifficulty(), MoneroDaemonRpc.prefixedHexToBI(val)));else
+      else if (key === "wide_difficulty") info.setDifficulty(_GenUtils.default.reconcile(info.getDifficulty(), MoneroDaemonRpc.prefixedHexToBI(val), { resolveMax: true }));else
+      if (key === "wide_cumulative_difficulty") info.setCumulativeDifficulty(_GenUtils.default.reconcile(info.getCumulativeDifficulty(), MoneroDaemonRpc.prefixedHexToBI(val), { resolveMax: true }));else
       if (key === "free_space") info.setFreeSpace(BigInt(val));else
       if (key === "database_size") info.setDatabaseSize(val);else
       if (key === "grey_peerlist_size") info.setNumOfflinePeers(val);else
@@ -1390,9 +1390,9 @@ class MoneroDaemonRpc extends _MoneroDaemon.default {
     for (let key of Object.keys(rpcChain)) {
       let val = rpcChain[key];
       if (key === "block_hash") {} // using block_hashes instead
-      else if (key === "difficulty") {} // handled by wide_difficulty
-      else if (key === "difficulty_top64") {} // handled by wide_difficulty
-      else if (key === "wide_difficulty") chain.setDifficulty(_GenUtils.default.reconcile(chain.getDifficulty(), MoneroDaemonRpc.prefixedHexToBI(val)));else
+      else if (key === "difficulty") chain.setDifficulty(_GenUtils.default.reconcile(chain.getDifficulty(), val, { resolveMax: true }));else
+      if (key === "difficulty_top64") {} // handled by wide_difficulty
+      else if (key === "wide_difficulty") chain.setDifficulty(_GenUtils.default.reconcile(chain.getDifficulty(), MoneroDaemonRpc.prefixedHexToBI(val), { resolveMax: true }));else
       if (key === "height") chain.setHeight(val);else
       if (key === "length") chain.setLength(val);else
       if (key === "block_hashes") chain.setBlockHashes(val);else
